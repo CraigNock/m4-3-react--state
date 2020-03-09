@@ -12,7 +12,8 @@ State is _dynamic data_. Things that change.
 
 ```jsx live=true
 const Counter = () => {
-  const [count, setCount] = React.useState(0);
+  //[variable, function]
+  const [count, setCount] = React.useState(0); //0 is initial value
 
   return (
     <>
@@ -40,7 +41,7 @@ const [value, setValue] = React.useState(null);
 
 ```jsx
 // Without deconstruction:
-const valueState = React.useState(null);
+const valueStateBeef = React.useState(null);
 const value = valueState[0];
 const setValue = valueState[1];
 ```
@@ -64,6 +65,9 @@ This snippet won't throw an error, but it also won't work:
 let [value, setValue] = React.useState(null);
 
 value = 10;
+
+//never modify the value yourself, the function should only do it, value will only change when the function triggers rerender of the component
+//ie if you set it to 10, it will always rerender to 10, not matter the function(breaks)
 ```
 
 ---
@@ -84,6 +88,7 @@ This is why the values on the screen change.
 
 ```jsx live=true
 const Name = () => {
+  //set"Variable" is a common naming convention
   const [name, setName] = React.useState('');
 
   return (
@@ -136,6 +141,8 @@ function SomeComponent() {
     </button>
   )
 }
+
+// 11 12 13
 ```
 
 ---
@@ -157,6 +164,8 @@ function SomeComponent() {
     />
   )
 }
+
+// Hi!
 ```
 
 ---
@@ -244,6 +253,41 @@ const SearchInput = () => {
 const SearchResults = () => {
   // ??
 }
+
+////// let the parent hold the state, so both children can be passed to
+//**both components using the state will be rerendered on change 
+const App = () => {
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  return (
+    <>
+      <SearchInput 
+      searchTerm={searchTerm}
+      setSearchTerm = {setSearchTerm}
+       />
+      <SearchResults />
+    </>
+  )
+}
+
+const SearchInput = ({searchTerm, setSearchTerm}) => {
+
+  return (
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={(ev) => {
+        setSearchTerm(ev.target.value);
+      }}
+    />
+  );
+}
+
+const SearchResults = ({searchTerm}) => {
+  // ?? stuff
+}
+
+
 ```
 
 ---
@@ -272,11 +316,41 @@ const Counter = () => {
 };
 
 const App = () => {
+
   return (
     <>
       The current count is: ???
 
       <Counter />
+    </>
+  )
+}
+
+render(<App />)
+
+///////
+
+const Counter = ({count, setCount}) => {
+
+  return (
+    <>
+      <button onClick={() => setCount(count + 1)}>
+        Increment
+      </button>
+    </>
+  )
+};
+//note App uses Counter, so counter is generally declared before App
+const App = () => {
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <>
+      <p>The current count is: {count}</p>
+      <Counter 
+      count= {count}
+      setCount= {setCount}
+      />
     </>
   )
 }
@@ -307,7 +381,7 @@ const FavouriteFood = () => {
           type="radio"
           name="food"
           value="broccoli"
-          checked={food === 'broccoli'}
+          checked={food === 'broccoli'} //marks as checked if food === broc
           onChange={() => setFood('broccoli')}
         />
         Broccoli
@@ -322,6 +396,50 @@ const App = () => {
       My favourite food is: ???
       <br /><br />
       <FavouriteFood />
+    </>
+  )
+}
+
+render(<App />)
+
+////////////////////////
+
+const FavouriteFood = ({setFood}) => {
+  return (
+    <>
+      <label>
+        <input
+          type="radio"
+          name="food"
+          value="pizza"
+          onChange={() => setFood('pizza')}
+        />
+        Pizza
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="food"
+          value="broccoli"
+          onChange={() => setFood('broccoli')}
+        />
+        Broccoli
+      </label>
+    </>
+  )
+};
+
+const App = () => {
+  const [food, setFood] = React.useState('');
+
+  return (
+    <>
+      <p> My favourite food is: {food} </p>
+      
+      <FavouriteFood
+        food= {food} 
+        setFood= {setFood}
+       />
     </>
   )
 }

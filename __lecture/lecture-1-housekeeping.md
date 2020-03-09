@@ -25,6 +25,13 @@ const BlueButton = styled.button`
   background: #2B00D7;
   color: #FFF;
 `
+///// BLuebutton basically extends Button, this is how:
+const BlueButton = styled.(Button)`
+  background: #2B00D7;
+  color: #FFF;
+`
+
+
 
 render(<>
   <Button>Button 1</Button>
@@ -46,6 +53,10 @@ const ListItem = styled.li`
     border-bottom: none;
   }
 `
+
+.dsfdsf :last-of-type {
+  
+}
 ```
 
 ---
