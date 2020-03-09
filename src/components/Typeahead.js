@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {categories} from '../data'
 
 const Entry = ({book, input}) => {
-    let split = book.title.indexOf(input) + input.length+1;
+    let split = book.title.indexOf(input) + input.length;
     let genre = categories[book.categoryId].name;
     return (
         <>
@@ -14,55 +14,80 @@ const Entry = ({book, input}) => {
     )
 }
 
-const Suggester = ({array, input, handleSelect}) => {
-    if(input.length > 1){
-        let list = array.filter(book => {
-        return book.title.toLowerCase().includes(input.toLowerCase())
-        })
+const Suggester = ({list, input, handleSelect, selectedIndex}) => {
+    if(input.length >1){
         return (
             <ul>
-            {list.map(book => {
-            return (
-                <li 
-                key={book.id}
-                onClick={() => handleSelect(book.title)}
-                >
-                    <Entry book={book} input={input} />
-                </li>
-            )
-            })}
+                {list.map(book => {
+                    return (
+                        <li 
+                        key={book.id}
+                        onClick={() => handleSelect(book.title)}
+                        >
+                        <Entry book={book} input={input} />
+                    </li>
+                )})}
             </ul>
         )
-    } else {
-        return ''
-    }
-    ;
-    
-}
+    } else { return ''}
+;}
 
+// const isSelected = () => {
+
+// }
 
 const TypeAhead = ({books, handleSelect}) => {
-    const [book, setBook] = React.useState('');
+    const [value, setValue] = React.useState('');
+    const [selectedIndex, setSelectedIndex] = React.useState(0);
+    const [list, setList] = React.useState([]);
+
+    const renderList = (input) => {
+        if(input.length > 1){
+            let filteredList = (books.filter(bookyy => {
+            return bookyy.title.toLowerCase().includes(input.toLowerCase())
+            }))
+            console.log('filteredList',filteredList);
+            setList(filteredList);
+        } else { return ''}
+    }
+
     return(
         <StyledBox>
             <StyledInput 
             type='text'
-            value={book}
-            onChange={ev => setBook(ev.target.value)}
-            onKeyDown={ev => {
-                if (ev.key === 'Enter') {
-                    handleSelect(ev.target.value);
-                }
+            value={value}
+            onChange={ev => {
+                setValue(ev.target.value); 
+                renderList(ev.target.value);
             }}
+            onKeyDown={ev => {
+                switch (ev.key) {
+                    case 'Enter': {
+                        handleSelect(ev.target.value);
+                        return;
+                    }
+                    case 'ArrowUp': {
+                        setSelectedIndex(selectedIndex - 1)
+                        break;
+                    }
+                    case 'ArrowDown': {
+                        setSelectedIndex(selectedIndex + 1)
+                        break;
+                    }
+                    default:
+                }}
+            }
             />
-            <StyledButton onClick={() => setBook('')}>
+            <StyledButton onClick={() => setValue('')}>
                 Clear
             </StyledButton>
             
             <Suggester 
-            array={books} 
-            input={book}
+            list={list} 
+            input={value}
             handleSelect={handleSelect}
+            selectedIndex={selectedIndex}
+            
             />
             
         </StyledBox>
