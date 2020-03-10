@@ -339,7 +339,7 @@ We're already listening for keypresses, since we're calling the handler when the
 />
 ```
 
-Right now, we don't really have a notion of which item is "selected"; we have a yellow hover state, but that's tracked in CSS.
+Right now, we don't really have a notion of which item is "selected"; we have a hover state, but that's tracked in CSS.
 
 We can think of the currently-selected item as some data that changes over time. And for dynamic data, we use React state.
 
@@ -380,7 +380,7 @@ const Typeahead = (
 };
 ```
 
-Earlier, we suggested adding a hover state to each list item. Let's remove that; instead, the yellow background will be managed through React, based on the currently-selected index.
+Earlier, we suggested adding a hover state to each list item. Let's remove that; instead, the background will be managed through React, based on the currently-selected index.
 
 There is a way to set dynamic styles using the `styled` helper, but inline styles are a simpler strategy in these cases:
 

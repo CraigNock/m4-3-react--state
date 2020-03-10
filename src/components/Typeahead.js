@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import {categories} from '../data'
 
-const Entry = ({book, input}) => {
-    let split = book.title.indexOf(input) + input.length;
+const Entry = ({book, input, selected}) => {
+    let split = book.title.toLowerCase().indexOf(input.toLowerCase()) + input.length;
     let genre = categories[book.categoryId].name;
     return (
         <>
@@ -14,19 +14,27 @@ const Entry = ({book, input}) => {
     )
 }
 
-const Suggester = ({list, input, handleSelect, selectedIndex}) => {
+const Suggester = ({list, input, handleSelect, selectedIndex, setSelectedIndex}) => {
     if(input.length >1){
         return (
             <ul>
-                {list.map(book => {
+                {list.map((book, index) => {
+                    let selected = (selectedIndex === index)? true : false;
+                    
                     return (
                         <li 
+                        onMouseEnter={() => setSelectedIndex(index)}
+                        style={{
+                            background: selected? 'slateblue' : 'transparent',
+                            color: selected? 'whitesmoke' : 'black'
+                        }}
                         key={book.id}
                         onClick={() => handleSelect(book.title)}
                         >
-                        <Entry book={book} input={input} />
-                    </li>
-                )})}
+                        <Entry book={book} input={input} selected={selected} />
+                        </li>
+                    )
+                })}
             </ul>
         )
     } else { return ''}
@@ -36,17 +44,18 @@ const Suggester = ({list, input, handleSelect, selectedIndex}) => {
 
 // }
 
+
 const TypeAhead = ({books, handleSelect}) => {
     const [value, setValue] = React.useState('');
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     const [list, setList] = React.useState([]);
 
-    const renderList = (input) => {
+    const getList = (input) => {
         if(input.length > 1){
-            let filteredList = (books.filter(bookyy => {
-            return bookyy.title.toLowerCase().includes(input.toLowerCase())
+            let filteredList = (books.filter(book => {
+            return book.title.toLowerCase().includes(input.toLowerCase())
             }))
-            console.log('filteredList',filteredList);
+            // console.log('filteredList',filteredList);
             setList(filteredList);
         } else { return ''}
     }
@@ -58,20 +67,21 @@ const TypeAhead = ({books, handleSelect}) => {
             value={value}
             onChange={ev => {
                 setValue(ev.target.value); 
-                renderList(ev.target.value);
+                getList(ev.target.value);
             }}
             onKeyDown={ev => {
                 switch (ev.key) {
                     case 'Enter': {
-                        handleSelect(ev.target.value);
+                        handleSelect(list[selectedIndex].title);
+                        console.log('beef ' +selectedIndex);
                         return;
                     }
                     case 'ArrowUp': {
-                        setSelectedIndex(selectedIndex - 1)
+                        setSelectedIndex(selectedIndex > 0? selectedIndex - 1 : selectedIndex);
                         break;
                     }
                     case 'ArrowDown': {
-                        setSelectedIndex(selectedIndex + 1)
+                        setSelectedIndex(selectedIndex < list.length -1 ? selectedIndex + 1 : selectedIndex)
                         break;
                     }
                     default:
@@ -87,7 +97,7 @@ const TypeAhead = ({books, handleSelect}) => {
             input={value}
             handleSelect={handleSelect}
             selectedIndex={selectedIndex}
-            
+            setSelectedIndex={setSelectedIndex}
             />
             
         </StyledBox>
@@ -100,23 +110,27 @@ const TypeAhead = ({books, handleSelect}) => {
 
 const StyledBox = styled.div`
     width: 100%;
+    height: 100vh;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    background: whitesmoke;
+    background-image: linear-gradient(to top, palegreen, whitesmoke);
+    
     
     li {
         padding: .3rem;
-        &:hover{
+        border-radius: 3px;
+        /* &:hover{
             cursor: pointer;
             background: slateblue;
             color: whitesmoke;
-        }
+        } */
     }
     ul {
-        box-shadow: 5px 5px 5px lightgrey;
+        box-shadow: 0px 0px 5px lightgrey;
         list-style-type: none;
         width: 40vw;
         margin: 0 auto;
+        padding: 0;
     }
 `;
 
@@ -135,7 +149,7 @@ const StyledCategory= styled.span`
 const StyledInput = styled.input`
     border: 1px solid lightgray;
     border-radius: 3px;
-    margin: .5rem;
+    margin: 1.5rem .5rem .5rem;
     padding: .5rem 1rem;
 
 `;
