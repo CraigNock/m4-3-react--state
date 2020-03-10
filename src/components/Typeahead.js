@@ -84,6 +84,7 @@ const TypeAhead = ({books, handleSelect}) => {
                         setSelectedIndex(selectedIndex < list.length -1 ? selectedIndex + 1 : selectedIndex)
                         break;
                     }
+                    ///case escape, toggle a state that affects display of ul?
                     default:
                 }}
             }
